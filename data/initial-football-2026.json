@@ -1,0 +1,18 @@
+{
+  "captured_at": "2026-09-07T11:52:00-05:00",
+  "source_notes": "Current KU Athletics schedule snapshot researched 2026-09-07. Schedule page/text route supplies date/time/site/city; current Game Center pages supply upcoming TV; KU's official 2026 schedule PDF supplies venue names. LIU TV is retained from KU's May 27 official announcement because the completed Game Center no longer displays it.",
+  "games": [
+    {"game_center_id":"20528","opponent":"LIU","date":"2026-09-04","site":"Home","location":"Lawrence, Kan.","venue":"David Booth Kansas Memorial Stadium","time":"19:00","network":"ESPNU","tournament":"","result":"W 51-6"},
+    {"game_center_id":"20530","opponent":"Missouri","date":"2026-09-11","site":"Home","location":"Lawrence, Kan.","venue":"David Booth Kansas Memorial Stadium","time":"19:00","network":"FOX","tournament":"StorageMart Border Showdown","result":""},
+    {"game_center_id":"20529","opponent":"Arizona State","date":"2026-09-19","site":"Neutral","location":"London, England","venue":"Wembley Stadium","time":"11:00","network":"FS1","tournament":"Union Jack Classic","result":""},
+    {"game_center_id":"20531","opponent":"Middle Tennessee","date":"2026-10-03","site":"Home","location":"Lawrence, Kan.","venue":"David Booth Kansas Memorial Stadium","time":null,"network":"","tournament":"","result":""},
+    {"game_center_id":"20532","opponent":"Utah","date":"2026-10-10","site":"Away","location":"Salt Lake City, Utah","venue":"Rice-Eccles Stadium","time":null,"network":"","tournament":"","result":""},
+    {"game_center_id":"20533","opponent":"Kansas State","date":"2026-10-17","site":"Away","location":"Manhattan, Kan.","venue":"Bill Snyder Family Stadium","time":null,"network":"","tournament":"Dillons Sunflower Showdown","result":""},
+    {"game_center_id":"20534","opponent":"Baylor","date":"2026-10-24","site":"Home","location":"Lawrence, Kan.","venue":"David Booth Kansas Memorial Stadium","time":null,"network":"","tournament":"","result":""},
+    {"game_center_id":"20535","opponent":"TCU","date":"2026-10-31","site":"Away","location":"Fort Worth, Texas","venue":"Amon G. Carter Stadium","time":null,"network":"","tournament":"","result":""},
+    {"game_center_id":"20536","opponent":"UCF","date":"2026-11-07","site":"Home","location":"Lawrence, Kan.","venue":"David Booth Kansas Memorial Stadium","time":null,"network":"","tournament":"","result":""},
+    {"game_center_id":"20537","opponent":"West Virginia","date":"2026-11-14","site":"Away","location":"Morgantown, W. Va.","venue":"Milan Puskar Stadium","time":null,"network":"","tournament":"","result":""},
+    {"game_center_id":"20538","opponent":"BYU","date":"2026-11-21","site":"Home","location":"Lawrence, Kan.","venue":"David Booth Kansas Memorial Stadium","time":null,"network":"","tournament":"","result":""},
+    {"game_center_id":"20539","opponent":"Oklahoma State","date":"2026-11-28","site":"Away","location":"Stillwater, Okla.","venue":"Boone Pickens Stadium","time":null,"network":"","tournament":"","result":""}
+  ]
+}

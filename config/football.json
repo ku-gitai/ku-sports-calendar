@@ -1,0 +1,67 @@
+{
+  "key": "football",
+  "sport_name": "Football",
+  "team_name": "Kansas",
+  "season": 2026,
+  "season_start_month": 7,
+  "source_type": "ku_sidearm",
+  "source_timezone": "America/Chicago",
+  "default_duration_minutes": 240,
+  "schedule_url": "https://kuathletics.com/sports/football/schedule/",
+  "schedule_text_url": "https://kuathletics.com/sports/football/schedule/text",
+  "output_path": "docs/ku-football.ics",
+  "uid_domain": "ku-sports-calendar.local",
+  "calendar_name": "KU Football",
+  "include_network_in_title": false,
+  "minimum_expected_games": 10,
+  "venue_overrides": {
+    "20528": {
+      "expected_location": "Lawrence, Kan.",
+      "venue": "David Booth Kansas Memorial Stadium"
+    },
+    "20530": {
+      "expected_location": "Lawrence, Kan.",
+      "venue": "David Booth Kansas Memorial Stadium"
+    },
+    "20529": {
+      "expected_location": "London, England",
+      "venue": "Wembley Stadium"
+    },
+    "20531": {
+      "expected_location": "Lawrence, Kan.",
+      "venue": "David Booth Kansas Memorial Stadium"
+    },
+    "20532": {
+      "expected_location": "Salt Lake City, Utah",
+      "venue": "Rice-Eccles Stadium"
+    },
+    "20533": {
+      "expected_location": "Manhattan, Kan.",
+      "venue": "Bill Snyder Family Stadium"
+    },
+    "20534": {
+      "expected_location": "Lawrence, Kan.",
+      "venue": "David Booth Kansas Memorial Stadium"
+    },
+    "20535": {
+      "expected_location": "Fort Worth, Texas",
+      "venue": "Amon G. Carter Stadium"
+    },
+    "20536": {
+      "expected_location": "Lawrence, Kan.",
+      "venue": "David Booth Kansas Memorial Stadium"
+    },
+    "20537": {
+      "expected_location": "Morgantown, W. Va.",
+      "venue": "Milan Puskar Stadium"
+    },
+    "20538": {
+      "expected_location": "Lawrence, Kan.",
+      "venue": "David Booth Kansas Memorial Stadium"
+    },
+    "20539": {
+      "expected_location": "Stillwater, Okla.",
+      "venue": "Boone Pickens Stadium"
+    }
+  }
+}
