@@ -1,0 +1,108 @@
+name: KU football game-day confirmation
+
+on:
+  schedule:
+    # Runs every morning; source work occurs only when the existing feed says KU plays today.
+    # 14:23 UTC is 8:23 a.m. CST / 9:23 a.m. CDT.
+    - cron: "23 14 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: ku-football-calendar
+  cancel-in-progress: false
+
+jobs:
+  build:
+    # Network parsing and PyPI dependencies never receive a write-capable token.
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.diff.outputs.changed }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install pinned runtime dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Is KU playing today?
+        id: gameday
+        shell: bash
+        run: |
+          set +e
+          PYTHONPATH=src python -m ku_sports_calendar is-game-day docs/ku-football.ics
+          code=$?
+          set -e
+          if [ "$code" -eq 0 ]; then
+            echo "run_update=true" >> "$GITHUB_OUTPUT"
+          elif [ "$code" -eq 3 ]; then
+            echo "run_update=false" >> "$GITHUB_OUTPUT"
+          else
+            exit "$code"
+          fi
+
+      - name: Final KU source check
+        if: steps.gameday.outputs.run_update == 'true' || github.event_name == 'workflow_dispatch'
+        run: PYTHONPATH=src python -m ku_sports_calendar update --config config/football.json
+
+      - name: Validate calendar
+        if: steps.gameday.outputs.run_update == 'true' || github.event_name == 'workflow_dispatch'
+        run: PYTHONPATH=src python -m ku_sports_calendar validate docs/ku-football.ics
+
+      - name: Detect feed change
+        id: diff
+        if: steps.gameday.outputs.run_update == 'true' || github.event_name == 'workflow_dispatch'
+        shell: bash
+        run: |
+          if git diff --quiet -- docs/ku-football.ics; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Stage validated feed as workflow artifact
+        if: steps.diff.outputs.changed == 'true'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: ku-football-feed
+          path: docs/ku-football.ics
+          if-no-files-found: error
+          retention-days: 1
+
+  commit:
+    needs: build
+    if: needs.build.outputs.changed == 'true'
+    # Only this small job can write, and it runs no project code or PyPI package.
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Download validated feed
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: ku-football-feed
+          path: docs
+
+      - name: Commit only the calendar feed
+        shell: bash
+        run: |
+          test -s docs/ku-football.ics
+          grep -q '^BEGIN:VCALENDAR' docs/ku-football.ics
+          grep -q '^END:VCALENDAR' docs/ku-football.ics
+          if git diff --quiet -- docs/ku-football.ics; then
+            echo "No calendar change."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- docs/ku-football.ics
+          git diff --cached --check
+          git commit -m "Game-day KU football calendar update"
+          git push
