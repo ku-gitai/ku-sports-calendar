@@ -114,52 +114,94 @@ def parse_text_schedule(html: str, *, sport_name: str, season: int, source_timez
 
 
 def _ancestor_text(anchor) -> str:
+    """Return text from the nearest schedule-game container around a Game Center link.
+
+    SIDEARM has used both ``li`` and ``div`` wrappers for schedule cards.  Prefer
+    the explicit per-game CSS containers and never promote a huge schedule-wide
+    ancestor to candidate context; doing so can make several games appear to share
+    the same Game Center ID.
+    """
     node = anchor
-    best = ""
-    for _ in range(8):
+    bounded_fallback = ""
+    for _ in range(12):
         node = node.parent
         if node is None:
             break
         text = normalize_space(node.get_text(" ", strip=True))
-        if len(text) > len(best):
-            best = text
-        if node.name in {"li", "article"}:
+        classes = set(node.get("class", [])) if hasattr(node, "get") else set()
+
+        if "sidearm-schedule-game" in classes or "sidearm-schedule-game-row" in classes:
             return text
-        if len(text) > 1200:
+        if node.name in {"li", "article"} and len(text) <= 2000:
+            return text
+
+        # Keep the largest nearby context that is still plausibly one game card.
+        # Once an ancestor becomes schedule-wide, retain the previous bounded value.
+        if 0 < len(text) <= 1200:
+            bounded_fallback = text
+        elif len(text) > 1200:
             break
-    return best
+    return bounded_fallback
 
 
 def attach_game_center_links(games: list[Game], schedule_html: str, base_url: str) -> None:
     soup = BeautifulSoup(schedule_html, "html.parser")
-    candidates: list[tuple[str, str, str]] = []
+    by_id: dict[str, tuple[str, str]] = {}
     for a in soup.select('a[href*="/game-center/"]'):
         href = a.get("href", "")
         m = GAME_CENTER_RE.search(href)
         if not m:
             continue
-        candidates.append((m.group(1), urljoin(base_url, href), _ancestor_text(a)))
+        gcid = m.group(1)
+        context = _ancestor_text(a)
+        url = urljoin(base_url, href)
+        # Duplicate links to the same Game Center can occur in responsive markup.
+        # Prefer the more specific (shorter) non-empty context.
+        old = by_id.get(gcid)
+        if old is None or (context and (not old[1] or len(context) < len(old[1]))):
+            by_id[gcid] = (url, context)
 
-    for game in games:
+    candidates = [(gcid, url, context) for gcid, (url, context) in by_id.items()]
+
+    # Build all plausible game/link matches, then assign one-to-one.  The one-to-one
+    # constraint is fail-safe protection against a site markup change accidentally
+    # assigning the same source-native ID to multiple calendar events.
+    edges: list[tuple[int, int, int, str, str]] = []
+    for game_index, game in enumerate(games):
         opp = normalize_name(game.opponent)
         month = game.date.strftime("%b").lower()
         day = str(game.date.day)
-        scored: list[tuple[int, str, str]] = []
+        location = normalize_name(game.location)
         for gcid, url, context in candidates:
             norm_context = normalize_name(context)
-            score = 0
-            if opp and opp in norm_context:
-                score += 10
+            if not opp or opp not in norm_context:
+                continue
             low = context.lower()
+            score = 10
             if month in low:
                 score += 2
             if re.search(rf"\b0?{re.escape(day)}\b", low):
+                score += 2
+            if location and location in norm_context:
                 score += 1
-            if score >= 10:
-                scored.append((score, gcid, url))
-        if scored:
-            scored.sort(reverse=True)
-            _, game.game_center_id, game.game_center_url = scored[0]
+            # Higher score wins; for ties, shorter context is more likely to be a
+            # single game card rather than a schedule-wide ancestor.
+            edges.append((score, -len(context), game_index, gcid, url))
+
+    assigned_games: set[int] = set()
+    assigned_ids: set[str] = set()
+    for _, _, game_index, gcid, url in sorted(edges, reverse=True):
+        if game_index in assigned_games or gcid in assigned_ids:
+            continue
+        game = games[game_index]
+        game.game_center_id = gcid
+        game.game_center_url = url
+        assigned_games.add(game_index)
+        assigned_ids.add(gcid)
+
+    ids = [g.game_center_id for g in games if g.game_center_id]
+    if len(ids) != len(set(ids)):
+        raise ValueError("KU schedule mapped multiple games to the same Game Center ID")
 
 
 def parse_game_center_media(html: str) -> tuple[str, str, str]:
