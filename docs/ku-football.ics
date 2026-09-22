@@ -50,42 +50,43 @@ X-KU-CONTENT-HASH:7a3bd9f373ce6f9f6558b61a
 END:VEVENT
 BEGIN:VEVENT
 UID:ku-football-2026-20529@ku-sports-calendar.local
-DTSTAMP:20260907T165200Z
-LAST-MODIFIED:20260907T165200Z
-SEQUENCE:0
+DTSTAMP:20260922T142649Z
+LAST-MODIFIED:20260922T142649Z
+SEQUENCE:1
 DTSTART:20260919T160000Z
 DTEND:20260919T200000Z
 X-KU-TIME-STATUS:CONFIRMED
 X-KU-SOURCE-TZ:America/Chicago
 SUMMARY:Kansas vs. Arizona State
 DESCRIPTION:KU Football\nSite: Neutral\nKickoff: 11:00 AM CT\nTV: FS1\nEven
- t: Union Jack Classic\nKU Game Center: https://kuathletics.com/game-center
- /20529
+ t: Union Jack Classic\nResult: L 17-24\nKU Game Center: https://kuathletic
+ s.com/game-center/20529
 LOCATION:Wembley Stadium — London\, England
 URL:https://kuathletics.com/game-center/20529
 CATEGORIES:KU\,Football
 TRANSP:TRANSPARENT
 X-KU-SITE:Neutral
 X-KU-NETWORK:FS1
-X-KU-CONTENT-HASH:db4383b0e0bc7fc1eb03887d
+X-KU-CONTENT-HASH:d928a833bdf8422dcd5f58bc
 END:VEVENT
 BEGIN:VEVENT
 UID:ku-football-2026-20531@ku-sports-calendar.local
-DTSTAMP:20260907T165200Z
-LAST-MODIFIED:20260907T165200Z
-SEQUENCE:0
-DTSTART;VALUE=DATE:20261003
-DTEND;VALUE=DATE:20261004
-X-KU-TIME-STATUS:TBA
+DTSTAMP:20260922T142649Z
+LAST-MODIFIED:20260922T142649Z
+SEQUENCE:1
+DTSTART:20261003T160000Z
+DTEND:20261003T200000Z
+X-KU-TIME-STATUS:CONFIRMED
+X-KU-SOURCE-TZ:America/Chicago
 SUMMARY:Kansas vs. Middle Tennessee
-DESCRIPTION:KU Football\nSite: Home\nKickoff: TBA\nKU Game Center: https://
- kuathletics.com/game-center/20531
+DESCRIPTION:KU Football\nSite: Home\nKickoff: 11:00 AM CT\nKU Game Center: 
+ https://kuathletics.com/game-center/20531
 LOCATION:David Booth Kansas Memorial Stadium — Lawrence\, Kan.
 URL:https://kuathletics.com/game-center/20531
 CATEGORIES:KU\,Football
 TRANSP:TRANSPARENT
 X-KU-SITE:Home
-X-KU-CONTENT-HASH:92b4c203edf2ba1f77ce7bc0
+X-KU-CONTENT-HASH:9e634611ddbe65deadb3e72f
 END:VEVENT
 BEGIN:VEVENT
 UID:ku-football-2026-20532@ku-sports-calendar.local
