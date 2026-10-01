@@ -138,58 +138,68 @@ def parse_text_schedule(html: str, *, sport_name: str, season: int, source_timez
     return games
 
 
+def _game_center_ids(node) -> set[str]:
+    """Return unique KU Game Center IDs contained inside *node*."""
+    ids: set[str] = set()
+    for a in node.find_all("a", href=True):
+        m = GAME_CENTER_RE.search(a.get("href", ""))
+        if m:
+            ids.add(m.group(1))
+    return ids
+
+
 def _ancestor_game_node(anchor):
-    """Return the nearest per-game SIDEARM schedule container for an anchor."""
+    """Return the largest ancestor that still belongs to exactly one game.
+
+    SIDEARM can wrap a game in several nested ``div`` elements and can duplicate
+    links for responsive layouts.  CSS class names are not stable enough to be
+    the only boundary.  A stronger boundary is the Game Center ID itself: climb
+    upward while every Game Center link in the ancestor points to the *same*
+    game, and stop before the ancestor starts containing another game's ID.
+
+    This prevents TV-logo metadata from one schedule card leaking into every
+    other game when SIDEARM changes its wrapper markup.
+    """
+    href = anchor.get("href", "")
+    m = GAME_CENTER_RE.search(href)
+    if not m:
+        return None
+    target_id = m.group(1)
+
     node = anchor
-    bounded_fallback = None
-    for _ in range(12):
+    candidate = None
+    for _ in range(16):
         node = node.parent
         if node is None:
             break
-        text = normalize_space(node.get_text(" ", strip=True))
-        classes = set(node.get("class", [])) if hasattr(node, "get") else set()
-
-        if "sidearm-schedule-game" in classes or "sidearm-schedule-game-row" in classes:
-            return node
-        if node.name in {"li", "article"} and len(text) <= 2000:
-            return node
-
-        # Keep the largest nearby context that is still plausibly one game card.
-        # Once an ancestor becomes schedule-wide, retain the previous bounded value.
-        if 0 < len(text) <= 1200:
-            bounded_fallback = node
-        elif len(text) > 1200:
-            break
-    return bounded_fallback
+        ids = _game_center_ids(node)
+        if target_id not in ids:
+            continue
+        if len(ids) == 1:
+            candidate = node
+            continue
+        # This ancestor contains at least one other scheduled game's Game Center
+        # link, so the previous candidate is the outer boundary of this game card.
+        break
+    return candidate
 
 
 def _ancestor_text(anchor) -> str:
-    """Return text from the nearest schedule-game container around a Game Center link."""
+    """Return visible text from the bounded schedule card for one game."""
     node = _ancestor_game_node(anchor)
     return normalize_space(node.get_text(" ", strip=True)) if node is not None else ""
 
 
-def _network_from_schedule_card(anchor) -> str:
-    """Read TV network metadata from the official KU schedule card.
-
-    KU frequently renders the TV network as a logo instead of visible text.  The
-    network name can still be present in the card's HTML attributes (for example
-    ``alt``, ``title``, ``aria-label``, image URLs, data attributes, or inline
-    styles).  Serializing only the bounded per-game card lets us inspect that
-    metadata without OCR and without accidentally matching another game's logo.
-    """
-    node = _ancestor_game_node(anchor)
-    if node is None:
+def _network_from_metadata(value: str) -> str:
+    """Extract a canonical TV network from an HTML attribute/asset reference."""
+    value = normalize_space(value)
+    if not value:
         return ""
 
-    raw = str(node)
+    low = value.lower()
+    compact = re.sub(r"[^a-z0-9+]+", "", low)
 
-    # Asset filenames sometimes separate a network name with punctuation, such as
-    # ``espn-u.svg`` or ``fs-1.png``.  Compacting the bounded card HTML handles
-    # those variants while still avoiding schedule-wide false matches.  Check the
-    # specific compact aliases before the general regex so ``espn-u`` does not get
-    # prematurely interpreted as plain ``ESPN``.
-    compact = re.sub(r"[^a-z0-9+]+", "", raw.lower())
+    # Specific aliases first so e.g. ``espn-u.svg`` is not reduced to ESPN.
     aliases = (
         ("big12nowonespn+", "Big 12 Now on ESPN+"),
         ("big12nowonespnplus", "Big 12 Now on ESPN+"),
@@ -205,21 +215,63 @@ def _network_from_schedule_card(anchor) -> str:
         ("trutv", "truTV"),
         ("fs1", "FS1"),
         ("fs2", "FS2"),
-        ("espn", "ESPN"),
-        ("fox", "FOX"),
-        ("cbs", "CBS"),
-        ("nbc", "NBC"),
-        ("abc", "ABC"),
-        ("btn", "BTN"),
-        ("tnt", "TNT"),
-        ("tbs", "TBS"),
     )
     for token, network in aliases:
         if token in compact:
             return network
 
-    match = NETWORK_RE.search(raw)
+    match = NETWORK_RE.search(value)
     return _canonical_network(match.group(1)) if match else ""
+
+
+def _attrs_text(tag) -> str:
+    """Flatten relevant HTML attributes into searchable text."""
+    pieces: list[str] = []
+    for key, value in getattr(tag, "attrs", {}).items():
+        if isinstance(value, (list, tuple)):
+            value = " ".join(str(v) for v in value)
+        pieces.append(f"{key}={value}")
+    return " ".join(pieces)
+
+
+def _network_from_schedule_card(anchor) -> str:
+    """Read a TV-logo network from the official KU schedule card without OCR.
+
+    Only media-like elements inside the *single-game* boundary are inspected.
+    We intentionally do not serialize/search the whole card or its visible text;
+    doing that can pick up unrelated global ESPN references when SIDEARM changes
+    wrapper structure.
+    """
+    node = _ancestor_game_node(anchor)
+    if node is None:
+        return ""
+
+    # The KU schedule currently renders TV as a graphic.  Its filename/source or
+    # accessibility metadata is enough to identify the network.
+    for tag in node.find_all(["img", "source", "svg", "use"]):
+        network = _network_from_metadata(_attrs_text(tag))
+        if network:
+            return network
+
+    # Some SIDEARM themes put the TV asset in a CSS background or data attribute
+    # on a media/network wrapper rather than an <img>.  Inspect only elements whose
+    # own metadata says they are TV/broadcast/media related.
+    for tag in node.find_all(True):
+        marker = " ".join(
+            [
+                str(tag.get("id", "")),
+                " ".join(tag.get("class", []) if isinstance(tag.get("class", []), list) else [str(tag.get("class", ""))]),
+                str(tag.get("aria-label", "")),
+                str(tag.get("title", "")),
+            ]
+        ).lower()
+        if not re.search(r"\b(tv|television|network|broadcast|media)\b", marker):
+            continue
+        network = _network_from_metadata(_attrs_text(tag))
+        if network:
+            return network
+
+    return ""
 
 
 def attach_game_center_links(games: list[Game], schedule_html: str, base_url: str) -> None:
