@@ -29,207 +29,217 @@ X-KU-CONTENT-HASH:b429d6b9f7af617d1f91374a
 END:VEVENT
 BEGIN:VEVENT
 UID:ku-football-2026-20530@ku-sports-calendar.local
-DTSTAMP:20260915T142717Z
-LAST-MODIFIED:20260915T142717Z
-SEQUENCE:2
+DTSTAMP:20261001T005857Z
+LAST-MODIFIED:20261001T005857Z
+SEQUENCE:3
 DTSTART:20260912T000000Z
 DTEND:20260912T040000Z
 X-KU-TIME-STATUS:CONFIRMED
 X-KU-SOURCE-TZ:America/Chicago
 SUMMARY:Kansas vs. #23 Missouri
-DESCRIPTION:KU Football\nSite: Home\nKickoff: 7:00 PM CT\nTV: FOX\nEvent: S
- torageMart Border Showdown\nResult: L 21-38\nKU Game Center: https://kuath
- letics.com/game-center/20530
+DESCRIPTION:KU Football\nSite: Home\nKickoff: 7:00 PM CT\nTV: ESPNU\nEvent:
+  StorageMart Border Showdown\nResult: L 21-38\nKU Game Center: https://kua
+ thletics.com/game-center/20530
 LOCATION:David Booth Kansas Memorial Stadium — Lawrence\, Kan.
 URL:https://kuathletics.com/game-center/20530
 CATEGORIES:KU\,Football
 TRANSP:TRANSPARENT
 X-KU-SITE:Home
-X-KU-NETWORK:FOX
-X-KU-CONTENT-HASH:7a3bd9f373ce6f9f6558b61a
+X-KU-NETWORK:ESPNU
+X-KU-CONTENT-HASH:94f732f88f3c0b3bf410afb6
 END:VEVENT
 BEGIN:VEVENT
 UID:ku-football-2026-20529@ku-sports-calendar.local
-DTSTAMP:20260922T142649Z
-LAST-MODIFIED:20260922T142649Z
-SEQUENCE:1
+DTSTAMP:20261001T005857Z
+LAST-MODIFIED:20261001T005857Z
+SEQUENCE:2
 DTSTART:20260919T160000Z
 DTEND:20260919T200000Z
 X-KU-TIME-STATUS:CONFIRMED
 X-KU-SOURCE-TZ:America/Chicago
 SUMMARY:Kansas vs. Arizona State
-DESCRIPTION:KU Football\nSite: Neutral\nKickoff: 11:00 AM CT\nTV: FS1\nEven
- t: Union Jack Classic\nResult: L 17-24\nKU Game Center: https://kuathletic
- s.com/game-center/20529
+DESCRIPTION:KU Football\nSite: Neutral\nKickoff: 11:00 AM CT\nTV: ESPNU\nEv
+ ent: Union Jack Classic\nResult: L 17-24\nKU Game Center: https://kuathlet
+ ics.com/game-center/20529
 LOCATION:Wembley Stadium — London\, England
 URL:https://kuathletics.com/game-center/20529
 CATEGORIES:KU\,Football
 TRANSP:TRANSPARENT
 X-KU-SITE:Neutral
-X-KU-NETWORK:FS1
-X-KU-CONTENT-HASH:d928a833bdf8422dcd5f58bc
+X-KU-NETWORK:ESPNU
+X-KU-CONTENT-HASH:3b6965eef16286205e38430a
 END:VEVENT
 BEGIN:VEVENT
 UID:ku-football-2026-20531@ku-sports-calendar.local
-DTSTAMP:20260922T142649Z
-LAST-MODIFIED:20260922T142649Z
-SEQUENCE:1
+DTSTAMP:20261001T005857Z
+LAST-MODIFIED:20261001T005857Z
+SEQUENCE:2
 DTSTART:20261003T160000Z
 DTEND:20261003T200000Z
 X-KU-TIME-STATUS:CONFIRMED
 X-KU-SOURCE-TZ:America/Chicago
 SUMMARY:Kansas vs. Middle Tennessee
-DESCRIPTION:KU Football\nSite: Home\nKickoff: 11:00 AM CT\nKU Game Center: 
- https://kuathletics.com/game-center/20531
+DESCRIPTION:KU Football\nSite: Home\nKickoff: 11:00 AM CT\nTV: BTN\nKU Game
+  Center: https://kuathletics.com/game-center/20531
 LOCATION:David Booth Kansas Memorial Stadium — Lawrence\, Kan.
 URL:https://kuathletics.com/game-center/20531
 CATEGORIES:KU\,Football
 TRANSP:TRANSPARENT
 X-KU-SITE:Home
-X-KU-CONTENT-HASH:9e634611ddbe65deadb3e72f
+X-KU-NETWORK:BTN
+X-KU-CONTENT-HASH:545f93244917a3d865846c1f
 END:VEVENT
 BEGIN:VEVENT
 UID:ku-football-2026-20532@ku-sports-calendar.local
-DTSTAMP:20260907T165200Z
-LAST-MODIFIED:20260907T165200Z
-SEQUENCE:0
+DTSTAMP:20261001T005857Z
+LAST-MODIFIED:20261001T005857Z
+SEQUENCE:1
 DTSTART;VALUE=DATE:20261010
 DTEND;VALUE=DATE:20261011
 X-KU-TIME-STATUS:TBA
 SUMMARY:Kansas at Utah
-DESCRIPTION:KU Football\nSite: Away\nKickoff: TBA\nKU Game Center: https://
- kuathletics.com/game-center/20532
+DESCRIPTION:KU Football\nSite: Away\nKickoff: TBA\nTV: ESPNU\nKU Game Cente
+ r: https://kuathletics.com/game-center/20532
 LOCATION:Rice-Eccles Stadium — Salt Lake City\, Utah
 URL:https://kuathletics.com/game-center/20532
 CATEGORIES:KU\,Football
 TRANSP:TRANSPARENT
 X-KU-SITE:Away
-X-KU-CONTENT-HASH:1816b41393f3ead387c96ada
+X-KU-NETWORK:ESPNU
+X-KU-CONTENT-HASH:5ab6750366dd206f2d977c01
 END:VEVENT
 BEGIN:VEVENT
 UID:ku-football-2026-20533@ku-sports-calendar.local
-DTSTAMP:20260907T165200Z
-LAST-MODIFIED:20260907T165200Z
-SEQUENCE:0
+DTSTAMP:20261001T005857Z
+LAST-MODIFIED:20261001T005857Z
+SEQUENCE:1
 DTSTART;VALUE=DATE:20261017
 DTEND;VALUE=DATE:20261018
 X-KU-TIME-STATUS:TBA
 SUMMARY:Kansas at Kansas State
-DESCRIPTION:KU Football\nSite: Away\nKickoff: TBA\nEvent: Dillons Sunflower
-  Showdown\nKU Game Center: https://kuathletics.com/game-center/20533
+DESCRIPTION:KU Football\nSite: Away\nKickoff: TBA\nTV: ESPNU\nEvent: Dillon
+ s Sunflower Showdown\nKU Game Center: https://kuathletics.com/game-center/
+ 20533
 LOCATION:Bill Snyder Family Stadium — Manhattan\, Kan.
 URL:https://kuathletics.com/game-center/20533
 CATEGORIES:KU\,Football
 TRANSP:TRANSPARENT
 X-KU-SITE:Away
-X-KU-CONTENT-HASH:214e41ec3c54d2aadd0f54e1
+X-KU-NETWORK:ESPNU
+X-KU-CONTENT-HASH:66475511a7a822fdded33fdf
 END:VEVENT
 BEGIN:VEVENT
 UID:ku-football-2026-20534@ku-sports-calendar.local
-DTSTAMP:20260907T165200Z
-LAST-MODIFIED:20260907T165200Z
-SEQUENCE:0
+DTSTAMP:20261001T005857Z
+LAST-MODIFIED:20261001T005857Z
+SEQUENCE:1
 DTSTART;VALUE=DATE:20261024
 DTEND;VALUE=DATE:20261025
 X-KU-TIME-STATUS:TBA
 SUMMARY:Kansas vs. Baylor
-DESCRIPTION:KU Football\nSite: Home\nKickoff: TBA\nKU Game Center: https://
- kuathletics.com/game-center/20534
+DESCRIPTION:KU Football\nSite: Home\nKickoff: TBA\nTV: ESPNU\nKU Game Cente
+ r: https://kuathletics.com/game-center/20534
 LOCATION:David Booth Kansas Memorial Stadium — Lawrence\, Kan.
 URL:https://kuathletics.com/game-center/20534
 CATEGORIES:KU\,Football
 TRANSP:TRANSPARENT
 X-KU-SITE:Home
-X-KU-CONTENT-HASH:de42edbffce554dce57eb170
+X-KU-NETWORK:ESPNU
+X-KU-CONTENT-HASH:86d2c665e42ce9993e0b0785
 END:VEVENT
 BEGIN:VEVENT
 UID:ku-football-2026-20535@ku-sports-calendar.local
-DTSTAMP:20260907T165200Z
-LAST-MODIFIED:20260907T165200Z
-SEQUENCE:0
+DTSTAMP:20261001T005857Z
+LAST-MODIFIED:20261001T005857Z
+SEQUENCE:1
 DTSTART;VALUE=DATE:20261031
 DTEND;VALUE=DATE:20261101
 X-KU-TIME-STATUS:TBA
 SUMMARY:Kansas at TCU
-DESCRIPTION:KU Football\nSite: Away\nKickoff: TBA\nKU Game Center: https://
- kuathletics.com/game-center/20535
+DESCRIPTION:KU Football\nSite: Away\nKickoff: TBA\nTV: ESPNU\nKU Game Cente
+ r: https://kuathletics.com/game-center/20535
 LOCATION:Amon G. Carter Stadium — Fort Worth\, Texas
 URL:https://kuathletics.com/game-center/20535
 CATEGORIES:KU\,Football
 TRANSP:TRANSPARENT
 X-KU-SITE:Away
-X-KU-CONTENT-HASH:13120df562fc22ab9f7be045
+X-KU-NETWORK:ESPNU
+X-KU-CONTENT-HASH:66ad8f29abdc523c07d14a1d
 END:VEVENT
 BEGIN:VEVENT
 UID:ku-football-2026-20536@ku-sports-calendar.local
-DTSTAMP:20260907T165200Z
-LAST-MODIFIED:20260907T165200Z
-SEQUENCE:0
+DTSTAMP:20261001T005857Z
+LAST-MODIFIED:20261001T005857Z
+SEQUENCE:1
 DTSTART;VALUE=DATE:20261107
 DTEND;VALUE=DATE:20261108
 X-KU-TIME-STATUS:TBA
 SUMMARY:Kansas vs. UCF
-DESCRIPTION:KU Football\nSite: Home\nKickoff: TBA\nKU Game Center: https://
- kuathletics.com/game-center/20536
+DESCRIPTION:KU Football\nSite: Home\nKickoff: TBA\nTV: ESPNU\nKU Game Cente
+ r: https://kuathletics.com/game-center/20536
 LOCATION:David Booth Kansas Memorial Stadium — Lawrence\, Kan.
 URL:https://kuathletics.com/game-center/20536
 CATEGORIES:KU\,Football
 TRANSP:TRANSPARENT
 X-KU-SITE:Home
-X-KU-CONTENT-HASH:4cf182c2f401007b6fb08527
+X-KU-NETWORK:ESPNU
+X-KU-CONTENT-HASH:768de9a88e426dd68e06cf40
 END:VEVENT
 BEGIN:VEVENT
 UID:ku-football-2026-20537@ku-sports-calendar.local
-DTSTAMP:20260907T165200Z
-LAST-MODIFIED:20260907T165200Z
-SEQUENCE:0
+DTSTAMP:20261001T005857Z
+LAST-MODIFIED:20261001T005857Z
+SEQUENCE:1
 DTSTART;VALUE=DATE:20261114
 DTEND;VALUE=DATE:20261115
 X-KU-TIME-STATUS:TBA
 SUMMARY:Kansas at West Virginia
-DESCRIPTION:KU Football\nSite: Away\nKickoff: TBA\nKU Game Center: https://
- kuathletics.com/game-center/20537
+DESCRIPTION:KU Football\nSite: Away\nKickoff: TBA\nTV: ESPNU\nKU Game Cente
+ r: https://kuathletics.com/game-center/20537
 LOCATION:Milan Puskar Stadium — Morgantown\, W. Va.
 URL:https://kuathletics.com/game-center/20537
 CATEGORIES:KU\,Football
 TRANSP:TRANSPARENT
 X-KU-SITE:Away
-X-KU-CONTENT-HASH:8b2c07d822ce15d6b9c28616
+X-KU-NETWORK:ESPNU
+X-KU-CONTENT-HASH:bc86223cbffd008bb1e42c13
 END:VEVENT
 BEGIN:VEVENT
 UID:ku-football-2026-20538@ku-sports-calendar.local
-DTSTAMP:20260907T165200Z
-LAST-MODIFIED:20260907T165200Z
-SEQUENCE:0
+DTSTAMP:20261001T005857Z
+LAST-MODIFIED:20261001T005857Z
+SEQUENCE:1
 DTSTART;VALUE=DATE:20261121
 DTEND;VALUE=DATE:20261122
 X-KU-TIME-STATUS:TBA
 SUMMARY:Kansas vs. BYU
-DESCRIPTION:KU Football\nSite: Home\nKickoff: TBA\nKU Game Center: https://
- kuathletics.com/game-center/20538
+DESCRIPTION:KU Football\nSite: Home\nKickoff: TBA\nTV: ESPNU\nKU Game Cente
+ r: https://kuathletics.com/game-center/20538
 LOCATION:David Booth Kansas Memorial Stadium — Lawrence\, Kan.
 URL:https://kuathletics.com/game-center/20538
 CATEGORIES:KU\,Football
 TRANSP:TRANSPARENT
 X-KU-SITE:Home
-X-KU-CONTENT-HASH:70ac3903be423240cb32c97a
+X-KU-NETWORK:ESPNU
+X-KU-CONTENT-HASH:e5ce57e53ccbd2a131dab05a
 END:VEVENT
 BEGIN:VEVENT
 UID:ku-football-2026-20539@ku-sports-calendar.local
-DTSTAMP:20260907T165200Z
-LAST-MODIFIED:20260907T165200Z
-SEQUENCE:0
+DTSTAMP:20261001T005857Z
+LAST-MODIFIED:20261001T005857Z
+SEQUENCE:1
 DTSTART;VALUE=DATE:20261128
 DTEND;VALUE=DATE:20261129
 X-KU-TIME-STATUS:TBA
 SUMMARY:Kansas at Oklahoma State
-DESCRIPTION:KU Football\nSite: Away\nKickoff: TBA\nKU Game Center: https://
- kuathletics.com/game-center/20539
+DESCRIPTION:KU Football\nSite: Away\nKickoff: TBA\nTV: ESPNU\nKU Game Cente
+ r: https://kuathletics.com/game-center/20539
 LOCATION:Boone Pickens Stadium — Stillwater\, Okla.
 URL:https://kuathletics.com/game-center/20539
 CATEGORIES:KU\,Football
 TRANSP:TRANSPARENT
 X-KU-SITE:Away
-X-KU-CONTENT-HASH:33795eec1f1ecd86f2dee8cd
+X-KU-NETWORK:ESPNU
+X-KU-CONTENT-HASH:28adeee4f19ba90d245409eb
 END:VEVENT
 END:VCALENDAR
