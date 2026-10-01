@@ -49,6 +49,31 @@ def parse_time(value: str) -> time | None:
         hour += 12
     return time(hour, minute)
 
+def _canonical_network(value: str) -> str:
+    canonical = {
+        "fox": "FOX",
+        "fs1": "FS1",
+        "fs2": "FS2",
+        "espnu": "ESPNU",
+        "espn": "ESPN",
+        "espn2": "ESPN2",
+        "espnews": "ESPNEWS",
+        "espn+": "ESPN+",
+        "cbs": "CBS",
+        "nbc": "NBC",
+        "abc": "ABC",
+        "cbssn": "CBSSN",
+        "btn": "BTN",
+        "tnt": "TNT",
+        "tbs": "TBS",
+        "trutv": "truTV",
+        "peacock": "Peacock",
+        "the cw": "The CW",
+        "big 12 now": "Big 12 Now",
+        "big 12 now on espn+": "Big 12 Now on ESPN+",
+    }
+    return canonical.get(value.lower(), value) if value else ""
+
 
 def _header_map(table) -> dict[str, int]:
     headers = [normalize_space(th.get_text(" ", strip=True)).lower() for th in table.find_all("th")]
@@ -113,16 +138,10 @@ def parse_text_schedule(html: str, *, sport_name: str, season: int, source_timez
     return games
 
 
-def _ancestor_text(anchor) -> str:
-    """Return text from the nearest schedule-game container around a Game Center link.
-
-    SIDEARM has used both ``li`` and ``div`` wrappers for schedule cards.  Prefer
-    the explicit per-game CSS containers and never promote a huge schedule-wide
-    ancestor to candidate context; doing so can make several games appear to share
-    the same Game Center ID.
-    """
+def _ancestor_game_node(anchor):
+    """Return the nearest per-game SIDEARM schedule container for an anchor."""
     node = anchor
-    bounded_fallback = ""
+    bounded_fallback = None
     for _ in range(12):
         node = node.parent
         if node is None:
@@ -131,22 +150,81 @@ def _ancestor_text(anchor) -> str:
         classes = set(node.get("class", [])) if hasattr(node, "get") else set()
 
         if "sidearm-schedule-game" in classes or "sidearm-schedule-game-row" in classes:
-            return text
+            return node
         if node.name in {"li", "article"} and len(text) <= 2000:
-            return text
+            return node
 
         # Keep the largest nearby context that is still plausibly one game card.
         # Once an ancestor becomes schedule-wide, retain the previous bounded value.
         if 0 < len(text) <= 1200:
-            bounded_fallback = text
+            bounded_fallback = node
         elif len(text) > 1200:
             break
     return bounded_fallback
 
 
+def _ancestor_text(anchor) -> str:
+    """Return text from the nearest schedule-game container around a Game Center link."""
+    node = _ancestor_game_node(anchor)
+    return normalize_space(node.get_text(" ", strip=True)) if node is not None else ""
+
+
+def _network_from_schedule_card(anchor) -> str:
+    """Read TV network metadata from the official KU schedule card.
+
+    KU frequently renders the TV network as a logo instead of visible text.  The
+    network name can still be present in the card's HTML attributes (for example
+    ``alt``, ``title``, ``aria-label``, image URLs, data attributes, or inline
+    styles).  Serializing only the bounded per-game card lets us inspect that
+    metadata without OCR and without accidentally matching another game's logo.
+    """
+    node = _ancestor_game_node(anchor)
+    if node is None:
+        return ""
+
+    raw = str(node)
+
+    # Asset filenames sometimes separate a network name with punctuation, such as
+    # ``espn-u.svg`` or ``fs-1.png``.  Compacting the bounded card HTML handles
+    # those variants while still avoiding schedule-wide false matches.  Check the
+    # specific compact aliases before the general regex so ``espn-u`` does not get
+    # prematurely interpreted as plain ``ESPN``.
+    compact = re.sub(r"[^a-z0-9+]+", "", raw.lower())
+    aliases = (
+        ("big12nowonespn+", "Big 12 Now on ESPN+"),
+        ("big12nowonespnplus", "Big 12 Now on ESPN+"),
+        ("big12now", "Big 12 Now"),
+        ("espnplus", "ESPN+"),
+        ("espn+", "ESPN+"),
+        ("espnews", "ESPNEWS"),
+        ("espnu", "ESPNU"),
+        ("espn2", "ESPN2"),
+        ("cbssn", "CBSSN"),
+        ("peacock", "Peacock"),
+        ("thecw", "The CW"),
+        ("trutv", "truTV"),
+        ("fs1", "FS1"),
+        ("fs2", "FS2"),
+        ("espn", "ESPN"),
+        ("fox", "FOX"),
+        ("cbs", "CBS"),
+        ("nbc", "NBC"),
+        ("abc", "ABC"),
+        ("btn", "BTN"),
+        ("tnt", "TNT"),
+        ("tbs", "TBS"),
+    )
+    for token, network in aliases:
+        if token in compact:
+            return network
+
+    match = NETWORK_RE.search(raw)
+    return _canonical_network(match.group(1)) if match else ""
+
+
 def attach_game_center_links(games: list[Game], schedule_html: str, base_url: str) -> None:
     soup = BeautifulSoup(schedule_html, "html.parser")
-    by_id: dict[str, tuple[str, str]] = {}
+    by_id: dict[str, tuple[str, str, str]] = {}
     for a in soup.select('a[href*="/game-center/"]'):
         href = a.get("href", "")
         m = GAME_CENTER_RE.search(href)
@@ -154,25 +232,36 @@ def attach_game_center_links(games: list[Game], schedule_html: str, base_url: st
             continue
         gcid = m.group(1)
         context = _ancestor_text(a)
+        schedule_network = _network_from_schedule_card(a)
         url = urljoin(base_url, href)
-        # Duplicate links to the same Game Center can occur in responsive markup.
-        # Prefer the more specific (shorter) non-empty context.
-        old = by_id.get(gcid)
-        if old is None or (context and (not old[1] or len(context) < len(old[1]))):
-            by_id[gcid] = (url, context)
 
-    candidates = [(gcid, url, context) for gcid, (url, context) in by_id.items()]
+        # Duplicate links to the same Game Center can occur in responsive markup.
+        # Prefer the more specific (shorter) non-empty context, but preserve network
+        # metadata found in either copy of the same game card.
+        old = by_id.get(gcid)
+        if old is None:
+            by_id[gcid] = (url, context, schedule_network)
+        else:
+            old_url, old_context, old_network = old
+            if context and (not old_context or len(context) < len(old_context)):
+                old_url, old_context = url, context
+            by_id[gcid] = (old_url, old_context, old_network or schedule_network)
+
+    candidates = [
+        (gcid, url, context, schedule_network)
+        for gcid, (url, context, schedule_network) in by_id.items()
+    ]
 
     # Build all plausible game/link matches, then assign one-to-one.  The one-to-one
     # constraint is fail-safe protection against a site markup change accidentally
     # assigning the same source-native ID to multiple calendar events.
-    edges: list[tuple[int, int, int, str, str]] = []
+    edges: list[tuple[int, int, int, str, str, str]] = []
     for game_index, game in enumerate(games):
         opp = normalize_name(game.opponent)
         month = game.date.strftime("%b").lower()
         day = str(game.date.day)
         location = normalize_name(game.location)
-        for gcid, url, context in candidates:
+        for gcid, url, context, schedule_network in candidates:
             norm_context = normalize_name(context)
             if not opp or opp not in norm_context:
                 continue
@@ -186,16 +275,18 @@ def attach_game_center_links(games: list[Game], schedule_html: str, base_url: st
                 score += 1
             # Higher score wins; for ties, shorter context is more likely to be a
             # single game card rather than a schedule-wide ancestor.
-            edges.append((score, -len(context), game_index, gcid, url))
+            edges.append((score, -len(context), game_index, gcid, url, schedule_network))
 
     assigned_games: set[int] = set()
     assigned_ids: set[str] = set()
-    for _, _, game_index, gcid, url in sorted(edges, reverse=True):
+    for _, _, game_index, gcid, url, schedule_network in sorted(edges, reverse=True):
         if game_index in assigned_games or gcid in assigned_ids:
             continue
         game = games[game_index]
         game.game_center_id = gcid
         game.game_center_url = url
+        if schedule_network:
+            game.network = schedule_network
         assigned_games.add(game_index)
         assigned_ids.add(gcid)
 
@@ -214,11 +305,7 @@ def parse_game_center_media(html: str) -> tuple[str, str, str]:
     end = min(end_points) if end_points else min(len(full_text), start + 3500)
     hero = full_text[start:end]
     match = NETWORK_RE.search(hero)
-    network = match.group(1) if match else ""
-    # Preserve KU's display capitalization where useful.
-    canonical = {"fox": "FOX", "fs1": "FS1", "fs2": "FS2", "espnu": "ESPNU", "espn": "ESPN", "espn2": "ESPN2", "espn+": "ESPN+", "cbs": "CBS", "nbc": "NBC", "abc": "ABC", "cbssn": "CBSSN", "btn": "BTN", "tnt": "TNT", "tbs": "TBS", "trutv": "truTV", "peacock": "Peacock", "the cw": "The CW"}
-    if network:
-        network = canonical.get(network.lower(), network)
+    network = _canonical_network(match.group(1) if match else "")
 
     stream_service = ""
     stream_url = ""
@@ -264,9 +351,15 @@ class KuSidearmScheduleSource:
                 try:
                     page = get_text(self.session, game.game_center_url)
                     network, service, stream_url = parse_game_center_media(page)
-                    game.network = network
-                    game.streaming_service = service
-                    game.streaming_url = stream_url
+                    # The main schedule card can be updated before Game Center.
+                    # Treat it as the primary TV source and use Game Center only to
+                    # fill fields the schedule card did not provide.
+                    if not game.network and network:
+                        game.network = network
+                    if service:
+                        game.streaming_service = service
+                    if stream_url:
+                        game.streaming_url = stream_url
                 except Exception:
                     # Base schedule is still usable when one Game Center page is unavailable.
                     pass
