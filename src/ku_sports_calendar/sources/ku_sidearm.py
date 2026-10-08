@@ -1,115 +1,96 @@
+from __future__ import annotations
+
+import re
+from datetime import date, datetime, time
+from urllib.parse import urljoin, urlparse
+
+from bs4 import BeautifulSoup
+
+from ..http import build_session, get_text
+from ..models import Game
+
+GAME_CENTER_RE = re.compile(r"/game-center/(\d+)")
+TIME_RE = re.compile(r"^(\d{1,2})(?::(\d{2}))?\s*([ap])\.?m\.?\s*(?:CT|CST|CDT)?$", re.IGNORECASE)
+MEDIA_TIME_RE = re.compile(
+    r"(?<!\d)(\d{1,2})(?::(\d{2}))?\s*([ap])\.?m\.?\s*(?:CT|CST|CDT)?\b",
+    re.IGNORECASE,
+)
+
+TV_NETWORK_RE = re.compile(
+    r"CBS Sports Network|ESPNU|ESPN2|ESPNEWS|ESPN(?!\+)|ABC|CBS|FOX|NBC|FS1|FS2|CBSSN|BTN|TNT|tru\s*TV|The CW",
+    re.IGNORECASE,
+)
+STREAMING_RE = re.compile(
+    r"Big 12 Now(?:\s*(?:/|on)\s*ESPN\+)?|ESPN\+|Peacock|Max",
+    re.IGNORECASE,
+)
+RADIO_RE = re.compile(
+    r"(?:Listen on\s+)?Jayhawk\s+(?:Sports|Radio)\s+Network",
+    re.IGNORECASE,
+)
 
 
-def attach_game_center_links(games: list[Game], schedule_html: str, base_url: str) -> None:
-    """Attach stable KU Game Center IDs/URLs without reading TV logos."""
-    soup = BeautifulSoup(schedule_html, "html.parser")
-    by_id: dict[str, tuple[str, str]] = {}
-    for anchor in soup.select('a[href*="/game-center/"]'):
-        href = anchor.get("href", "")
-        match = GAME_CENTER_RE.search(href)
-        if not match:
-            continue
-        gcid = match.group(1)
-        context = _ancestor_text(anchor)
-        url = urljoin(base_url, href)
-        old = by_id.get(gcid)
-        if old is None or (context and (not old[1] or len(context) < len(old[1]))):
-            by_id[gcid] = (url, context)
-
-    candidates = [(gcid, url, context) for gcid, (url, context) in by_id.items()]
-    edges: list[tuple[int, int, int, str, str]] = []
-
-    for game_index, game in enumerate(games):
-        opponent = normalize_name(game.opponent)
-        month = game.date.strftime("%b").lower()
-        day = str(game.date.day)
-        location = normalize_name(game.location)
-
-        for gcid, url, context in candidates:
-            normalized_context = normalize_name(context)
-            low = context.lower()
-            date_match = month in low and bool(re.search(rf"\b0?{re.escape(day)}\b", low))
-            opponent_match = bool(opponent and opponent in normalized_context)
-            if not date_match and not opponent_match:
-                continue
-
-            score = 0
-            if date_match:
-                score += 20
-            if opponent_match:
-                score += 10
-            if location and location in normalized_context:
-                score += 1
-            edges.append((score, -len(context), game_index, gcid, url))
-
-    assigned_games: set[int] = set()
-    assigned_ids: set[str] = set()
-    for _, _, game_index, gcid, url in sorted(edges, reverse=True):
-        if game_index in assigned_games or gcid in assigned_ids:
-            continue
-        game = games[game_index]
-        game.game_center_id = gcid
-        game.game_center_url = url
-        assigned_games.add(game_index)
-        assigned_ids.add(gcid)
-
-    ids = [game.game_center_id for game in games if game.game_center_id]
-    if len(ids) != len(set(ids)):
-        raise ValueError("KU schedule mapped multiple games to the same Game Center ID")
+def normalize_space(value: str) -> str:
+    return re.sub(r"\s+", " ", value or "").strip()
 
 
-class KuSidearmScheduleSource:
-    def __init__(self, config: dict, session=None):
-        self.config = config
-        self.session = session or build_session()
-
-    def fetch(self) -> list[Game]:
-        media_center_url = self.config.get("media_center_url")
-        if not media_center_url:
-            raise ValueError("football config is missing media_center_url")
-
-        # Football source priority:
-        #   1. Media Center: opponent/date/time/TV/streaming
-        #   2. Text schedule: site/location/tournament/result cross-check
-        #   3. Full schedule: stable Game Center IDs/URLs only
-        media_html = get_text(self.session, media_center_url)
-        text_html = get_text(self.session, self.config["schedule_text_url"])
-        schedule_html = get_text(self.session, self.config["schedule_url"])
-
-        games = parse_media_center_schedule(
-            media_html,
-            sport_name=self.config["sport_name"],
-            season=int(self.config["season"]),
-            source_timezone=self.config.get("source_timezone", "America/Chicago"),
-            season_start_month=int(self.config.get("season_start_month", 1)),
-        )
-        metadata_games = parse_text_schedule(
-            text_html,
-            sport_name=self.config["sport_name"],
-            season=int(self.config["season"]),
-            source_timezone=self.config.get("source_timezone", "America/Chicago"),
-            season_start_month=int(self.config.get("season_start_month", 1)),
-        )
-
-        merge_schedule_metadata(games, metadata_games)
-        attach_game_center_links(games, schedule_html, self.config["schedule_url"])
-
-        minimum = int(self.config.get("minimum_expected_games", 1))
-        if len(games) < minimum:
-            raise RuntimeError(f"Parsed only {len(games)} games; refusing to publish (minimum {minimum})")
-
-        if self.config.get("require_game_center_ids", False):
-            missing = [f"{game.date.isoformat()} {game.opponent}" for game in games if not game.game_center_id]
-            if missing:
-                raise RuntimeError("Missing stable KU Game Center IDs: " + "; ".join(missing))
-
-        for game in games:
-            override = self.config.get("venue_overrides", {}).get(game.game_center_id)
-            if override and normalize_space(game.location) == normalize_space(override.get("expected_location", "")):
-                game.venue = override.get("venue", "")
-
-        return games
+def normalize_name(value: str) -> str:
+    value = normalize_space(value).lower()
+    value = re.sub(r"^#?\d+\s+", "", value)
+    value = value.replace("university", "").replace("state university", "state")
+    return re.sub(r"[^a-z0-9]+", " ", value).strip()
 
 
-# Backward-compatible alias for the first sport implementation.
-KuSidearmFootballSource = KuSidearmScheduleSource
+def _opponent_key(value: str) -> str:
+    key = normalize_name(value)
+    aliases = {
+        "long island": "liu",
+        "liu": "liu",
+    }
+    return aliases.get(key, key)
+
+
+def _time_from_groups(match: re.Match[str]) -> time:
+    hour = int(match.group(1))
+    minute = int(match.group(2) or 0)
+    ampm = match.group(3).lower()
+    if hour == 12:
+        hour = 0
+    if ampm == "p":
+        hour += 12
+    return time(hour, minute)
+
+
+def parse_time(value: str) -> time | None:
+    value = normalize_space(value)
+    if not value or value.upper() in {"TBA", "TBD"}:
+        return None
+    value = value.replace("p.m.", "pm").replace("a.m.", "am").replace("p.m", "pm").replace("a.m", "am")
+    m = TIME_RE.match(value)
+    if not m:
+        raise ValueError(f"Unrecognized KU kickoff time: {value!r}")
+    return _time_from_groups(m)
+
+
+def parse_media_time(value: str) -> time | None:
+    """Extract a kickoff time from the Media Center TIME/RESULT field."""
+    value = normalize_space(value)
+    if not value:
+        return None
+    match = MEDIA_TIME_RE.search(value)
+    if match:
+        return _time_from_groups(match)
+    if re.search(r"\b(?:TBA|TBD)\b", value, re.IGNORECASE):
+        return None
+    raise ValueError(f"Unrecognized KU Media Center time/result value: {value!r}")
+
+
+def _canonical_network(value: str) -> str:
+    compact = re.sub(r"\s+", " ", normalize_space(value)).lower()
+    canonical = {
+        "fox": "FOX",
+        "fs1": "FS1",
+        "fs2": "FS2",
+        "espnu": "ESPNU",
+        "espn": "ESPN",
+        "espn2": "ESPN2",
