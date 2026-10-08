@@ -7,6 +7,7 @@
   "source_type": "ku_sidearm",
   "source_timezone": "America/Chicago",
   "default_duration_minutes": 240,
+  "media_center_url": "https://kuathletics.com/sports/2024/4/15/kansas-football-media-center",
   "schedule_url": "https://kuathletics.com/sports/football/schedule/",
   "schedule_text_url": "https://kuathletics.com/sports/football/schedule/text",
   "output_path": "docs/ku-football.ics",
@@ -14,6 +15,7 @@
   "calendar_name": "KU Football",
   "include_network_in_title": false,
   "minimum_expected_games": 10,
+  "require_game_center_ids": true,
   "venue_overrides": {
     "20528": {
       "expected_location": "Lawrence, Kan.",
