@@ -323,7 +323,20 @@ def parse_media_center_schedule(
     seen_dates: set[date] = set()
     for row in table.find_all("tr"):
         cells = row.find_all(["td", "th"], recursive=False)
-        if not cells or cells[0].name == "th" or len(cells) <= max(header.values()):
+        if not cells or cells[0].name == "th":
+            continue
+
+        # KU occasionally omits empty trailing cells (for example POSTGAME) on
+        # future games.  Only require the columns we actually read; otherwise a
+        # perfectly valid game can disappear merely because a later optional
+        # column is absent from that row.
+        required_indexes = [
+            header["date"],
+            header["opponent"],
+            header["time/result"],
+            header["tv/radio"],
+        ]
+        if len(cells) <= max(required_indexes):
             continue
 
         date_text = normalize_space(cells[header["date"]].get_text(" ", strip=True))
