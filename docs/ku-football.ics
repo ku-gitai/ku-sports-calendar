@@ -91,23 +91,23 @@ X-KU-CONTENT-HASH:6de5c1339b68d9956d215ed5
 END:VEVENT
 BEGIN:VEVENT
 UID:ku-football-2026-20532@ku-sports-calendar.local
-DTSTAMP:20261010T184123Z
-LAST-MODIFIED:20261010T184123Z
-SEQUENCE:5
+DTSTAMP:20261013T143524Z
+LAST-MODIFIED:20261013T143524Z
+SEQUENCE:6
 DTSTART:20261011T000000Z
 DTEND:20261011T040000Z
 X-KU-TIME-STATUS:CONFIRMED
 X-KU-SOURCE-TZ:America/Chicago
 SUMMARY:Kansas at Utah
-DESCRIPTION:KU Football\nSite: Away\nKickoff: 7:00 PM CT\nTV: ESPN\nKU Game
-  Center: https://kuathletics.com/game-center/20532
+DESCRIPTION:KU Football\nSite: Away\nKickoff: 7:00 PM CT\nTV: ESPN\nResult:
+  L 24-41\nKU Game Center: https://kuathletics.com/game-center/20532
 LOCATION:Rice-Eccles Stadium — Salt Lake City\, Utah
 URL:https://kuathletics.com/game-center/20532
 CATEGORIES:KU\,Football
 TRANSP:TRANSPARENT
 X-KU-SITE:Away
 X-KU-NETWORK:ESPN
-X-KU-CONTENT-HASH:7ddd513995de6e244b080e9a
+X-KU-CONTENT-HASH:f078736759e9a23c1d9b9b03
 END:VEVENT
 BEGIN:VEVENT
 UID:ku-football-2026-20533@ku-sports-calendar.local
@@ -132,21 +132,21 @@ X-KU-CONTENT-HASH:0532415fe9cf0e6ca209b337
 END:VEVENT
 BEGIN:VEVENT
 UID:ku-football-2026-20534@ku-sports-calendar.local
-DTSTAMP:20261001T010739Z
-LAST-MODIFIED:20261001T010739Z
-SEQUENCE:2
+DTSTAMP:20261013T143524Z
+LAST-MODIFIED:20261013T143524Z
+SEQUENCE:3
 DTSTART;VALUE=DATE:20261024
 DTEND;VALUE=DATE:20261025
 X-KU-TIME-STATUS:TBA
 SUMMARY:Kansas vs. Baylor
-DESCRIPTION:KU Football\nSite: Home\nKickoff: TBA\nKU Game Center: https://
- kuathletics.com/game-center/20534
+DESCRIPTION:KU Football\nSite: Home\nKickoff: TBA\nEvent: Homecoming\nKU Ga
+ me Center: https://kuathletics.com/game-center/20534
 LOCATION:David Booth Kansas Memorial Stadium — Lawrence\, Kan.
 URL:https://kuathletics.com/game-center/20534
 CATEGORIES:KU\,Football
 TRANSP:TRANSPARENT
 X-KU-SITE:Home
-X-KU-CONTENT-HASH:de42edbffce554dce57eb170
+X-KU-CONTENT-HASH:2f6123d8e118232663ea4164
 END:VEVENT
 BEGIN:VEVENT
 UID:ku-football-2026-20535@ku-sports-calendar.local
