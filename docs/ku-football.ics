@@ -132,17 +132,17 @@ X-KU-CONTENT-HASH:eab0692c6e6366d38d1a4103
 END:VEVENT
 BEGIN:VEVENT
 UID:ku-football-2026-20534@ku-sports-calendar.local
-DTSTAMP:20261020T182722Z
-LAST-MODIFIED:20261020T182722Z
-SEQUENCE:4
+DTSTAMP:20261027T192533Z
+LAST-MODIFIED:20261027T192533Z
+SEQUENCE:5
 DTSTART:20261024T170000Z
 DTEND:20261024T210000Z
 X-KU-TIME-STATUS:CONFIRMED
 X-KU-SOURCE-TZ:America/Chicago
 SUMMARY:Kansas vs. Baylor
 DESCRIPTION:KU Football\nSite: Home\nKickoff: 12:00 PM CT\nTV: TNT\nStreami
- ng: Max\nEvent: Homecoming\nKU Game Center: https://kuathletics.com/game-c
- enter/20534
+ ng: Max\nEvent: Homecoming\nResult: W 25-24\nKU Game Center: https://kuath
+ letics.com/game-center/20534
 LOCATION:David Booth Kansas Memorial Stadium — Lawrence\, Kan.
 URL:https://kuathletics.com/game-center/20534
 CATEGORIES:KU\,Football
@@ -150,7 +150,7 @@ TRANSP:TRANSPARENT
 X-KU-SITE:Home
 X-KU-NETWORK:TNT
 X-KU-STREAMING:Max
-X-KU-CONTENT-HASH:93b683f1c98a762a868365db
+X-KU-CONTENT-HASH:6dbd335ed08f503eca532e4c
 END:VEVENT
 BEGIN:VEVENT
 UID:ku-football-2026-20535@ku-sports-calendar.local
